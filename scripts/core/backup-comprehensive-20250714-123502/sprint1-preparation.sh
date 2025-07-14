@@ -2,7 +2,7 @@
 
 # Load configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/config-helper.sh"
+source "$SCRIPT_DIR/../setup/config-helper.sh"
 
 # Load project configuration
 load_config

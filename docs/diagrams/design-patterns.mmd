@@ -1,0 +1,221 @@
+classDiagram
+    %% Strategy Pattern for different project types
+    class AnalysisStrategy {
+        <<interface>>
+        +analyze(repository: Repository) ProjectModel
+    }
+    
+    class WebAppAnalysisStrategy {
+        +analyze(repository: Repository) ProjectModel
+    }
+    
+    class APIServiceAnalysisStrategy {
+        +analyze(repository: Repository) ProjectModel
+    }
+    
+    class MobileAppAnalysisStrategy {
+        +analyze(repository: Repository) ProjectModel
+    }
+    
+    AnalysisStrategy <|.. WebAppAnalysisStrategy
+    AnalysisStrategy <|.. APIServiceAnalysisStrategy
+    AnalysisStrategy <|.. MobileAppAnalysisStrategy
+    
+    %% Factory Pattern for creating analyzers
+    class AnalyzerFactory {
+        <<abstract>>
+        +createAnalyzer(projectType: ProjectType) AnalysisStrategy
+    }
+    
+    class ConcreteAnalyzerFactory {
+        +createAnalyzer(projectType: ProjectType) AnalysisStrategy
+    }
+    
+    AnalyzerFactory <|-- ConcreteAnalyzerFactory
+    ConcreteAnalyzerFactory ..> AnalysisStrategy : creates
+    
+    %% Observer Pattern for progress monitoring
+    class ProgressObserver {
+        <<interface>>
+        +update(progress: ProgressEvent) void
+    }
+    
+    class ProgressSubject {
+        <<abstract>>
+        -observers: List~ProgressObserver~
+        +addObserver(observer: ProgressObserver) void
+        +removeObserver(observer: ProgressObserver) void
+        +notifyObservers(event: ProgressEvent) void
+    }
+    
+    class ScrumMasterEngine {
+        +addObserver(observer: ProgressObserver) void
+        +processRepository() void
+        -notifyProgress(event: ProgressEvent) void
+    }
+    
+    class SlackNotifier {
+        +update(progress: ProgressEvent) void
+    }
+    
+    class DashboardUpdater {
+        +update(progress: ProgressEvent) void
+    }
+    
+    ProgressSubject <|-- ScrumMasterEngine
+    ProgressObserver <|.. SlackNotifier
+    ProgressObserver <|.. DashboardUpdater
+    ScrumMasterEngine o-- ProgressObserver : notifies
+    
+    %% Command Pattern for GitHub API operations
+    class GitHubCommand {
+        <<interface>>
+        +execute() CommandResult
+        +undo() void
+    }
+    
+    class CreateProjectCommand {
+        -projectData: ProjectData
+        +execute() CommandResult
+        +undo() void
+    }
+    
+    class CreateIssueCommand {
+        -issueData: IssueData
+        +execute() CommandResult
+        +undo() void
+    }
+    
+    class UpdateBoardCommand {
+        -boardData: BoardData
+        +execute() CommandResult
+        +undo() void
+    }
+    
+    GitHubCommand <|.. CreateProjectCommand
+    GitHubCommand <|.. CreateIssueCommand
+    GitHubCommand <|.. UpdateBoardCommand
+    
+    class CommandInvoker {
+        -commandHistory: Stack~GitHubCommand~
+        +executeCommand(command: GitHubCommand) CommandResult
+        +undoLastCommand() void
+    }
+    
+    CommandInvoker o-- GitHubCommand : executes
+    
+    %% Adapter Pattern for different documentation formats
+    class DocumentationAdapter {
+        <<interface>>
+        +parseDocumentation(content: string) ProjectRequirements
+    }
+    
+    class MarkdownAdapter {
+        +parseDocumentation(content: string) ProjectRequirements
+    }
+    
+    class WikiAdapter {
+        +parseDocumentation(content: string) ProjectRequirements
+    }
+    
+    class ConfluenceAdapter {
+        +parseDocumentation(content: string) ProjectRequirements
+    }
+    
+    DocumentationAdapter <|.. MarkdownAdapter
+    DocumentationAdapter <|.. WikiAdapter
+    DocumentationAdapter <|.. ConfluenceAdapter
+    
+    %% Composite Pattern for project structure
+    class ProjectComponent {
+        <<abstract>>
+        #name: string
+        +getName() string
+        +analyze() ComponentAnalysis
+    }
+    
+    class ProjectModule {
+        -components: List~ProjectComponent~
+        +add(component: ProjectComponent) void
+        +remove(component: ProjectComponent) void
+        +analyze() ComponentAnalysis
+    }
+    
+    class ProjectFile {
+        -fileType: FileType
+        -complexity: int
+        +analyze() ComponentAnalysis
+    }
+    
+    ProjectComponent <|-- ProjectModule
+    ProjectComponent <|-- ProjectFile
+    ProjectModule o-- ProjectComponent : contains
+    
+    %% Facade Pattern for simplified API access
+    class ScrumMasterFacade {
+        -repositoryAnalyzer: RepositoryAnalyzer
+        -issueGenerator: IssueGenerator
+        -sprintPlanner: SprintPlanner
+        -boardManager: BoardManager
+        +initializeProject(repoUrl: string) ProjectInitResult
+        +generateSprint(sprintNumber: int) SprintResult
+        +updateProgress() ProgressResult
+    }
+    
+    class RepositoryAnalyzer {
+        +analyzeRepository(repo: Repository) ProjectModel
+    }
+    
+    class IssueGenerator {
+        +generateIssues(model: ProjectModel) List~Issue~
+    }
+    
+    class SprintPlanner {
+        +planSprint(issues: List~Issue~) Sprint
+    }
+    
+    class BoardManager {
+        +createBoard(project: ProjectModel) Board
+        +updateBoard(sprint: Sprint) void
+    }
+    
+    ScrumMasterFacade --> RepositoryAnalyzer
+    ScrumMasterFacade --> IssueGenerator
+    ScrumMasterFacade --> SprintPlanner
+    ScrumMasterFacade --> BoardManager
+    
+    %% Template Method Pattern for analysis workflow
+    class AnalysisTemplate {
+        <<abstract>>
+        +runAnalysis() AnalysisResult
+        #discoverRepository() Repository*
+        #detectTechnology() TechnologyStack*
+        #parseDocumentation() Documentation*
+        #assessCurrentState() CurrentState*
+        #generateReport() AnalysisResult
+    }
+    
+    class WebAppAnalysis {
+        #discoverRepository() Repository
+        #detectTechnology() TechnologyStack
+        #parseDocumentation() Documentation
+        #assessCurrentState() CurrentState
+    }
+    
+    class APIServiceAnalysis {
+        #discoverRepository() Repository
+        #detectTechnology() TechnologyStack
+        #parseDocumentation() Documentation
+        #assessCurrentState() CurrentState
+    }
+    
+    AnalysisTemplate <|-- WebAppAnalysis
+    AnalysisTemplate <|-- APIServiceAnalysis
+    
+    %% Main orchestrator using multiple patterns
+    ScrumMasterFacade ..> AnalyzerFactory : uses
+    RepositoryAnalyzer ..> AnalysisTemplate : uses
+    RepositoryAnalyzer ..> DocumentationAdapter : uses
+    RepositoryAnalyzer ..> ProjectComponent : analyzes
+    ScrumMasterFacade ..> CommandInvoker : uses
+    ScrumMasterFacade --|> ProgressSubject : extends

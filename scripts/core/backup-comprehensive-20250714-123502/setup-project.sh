@@ -7,7 +7,7 @@ set -e
 
 # Load configuration
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/config-helper.sh"
+source "$SCRIPT_DIR/../setup/config-helper.sh"
 
 # Parse command line arguments
 ISSUES_FILE="${1}"

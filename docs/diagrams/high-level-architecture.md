@@ -1,0 +1,39 @@
+# High-Level Architecture
+
+flowchart TD
+    A[Repository Discovery] --> B{Deployment Mode?}
+    B -->|Separate Repo| C[GitHub Actions Trigger]
+    B -->|Embedded| D[Pull Request Integration]
+    
+    C --> E[Repository Analysis]
+    D --> E
+    
+    E --> F[Documentation Parser]
+    E --> G[Code Structure Analyzer]
+    E --> H[Existing Project Detection]
+    
+    F --> I[Project Understanding Engine]
+    G --> I
+    H --> I
+    
+    I --> J{Project Board Exists?}
+    J -->|No| K[Create GitHub Project]
+    J -->|Yes| L[Analyze Existing Board]
+    
+    K --> M[Project Configuration]
+    L --> M
+    
+    M --> N[Issue Generation Engine]
+    N --> O[Sprint Planning Engine]
+    O --> P[Kanban Board Setup]
+    P --> Q[Automation Workflow]
+    
+    Q --> R[Continuous Monitoring]
+    R --> S[Progress Tracking]
+    S --> T[Adaptive Planning]
+    
+    T --> U{Sprint Complete?}
+    U -->|No| R
+    U -->|Yes| V[Sprint Retrospective]
+    V --> W[Next Sprint Planning]
+    W --> R
