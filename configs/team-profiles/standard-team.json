@@ -1,0 +1,29 @@
+{
+  "name": "Standard Team",
+  "description": "Standard development team configuration",
+  "team_size": 5,
+  "sprint_duration_weeks": 2,
+  "velocity_points_per_sprint": 40,
+  "working_days_per_week": 5,
+  "hours_per_day": 8,
+  "roles": {
+    "developer": 3,
+    "senior_developer": 1,
+    "qa": 1
+  },
+  "capacity_distribution": {
+    "development": 0.7,
+    "testing": 0.2,
+    "planning": 0.1
+  },
+  "estimation_guidelines": {
+    "story_points": {
+      "1": "1-2 hours",
+      "2": "Half day",
+      "3": "1 day", 
+      "5": "2-3 days",
+      "8": "1 week",
+      "13": "Epic - break down"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "Web Application",
+  "description": "Standard web application with frontend and backend components",
+  "categories": ["frontend", "backend", "infrastructure", "testing"],
+  "default_sprints": 6,
+  "complexity_factors": {
+    "simple": 1,
+    "medium": 3,
+    "complex": 5,
+    "epic": 8
+  },
+  "issue_templates": {
+    "feature": {
+      "title_prefix": "Feature:",
+      "labels": ["enhancement", "feature"],
+      "body_template": "## Description\n\n## Acceptance Criteria\n\n## Technical Notes\n"
+    },
+    "bug": {
+      "title_prefix": "Bug:",
+      "labels": ["bug"],
+      "body_template": "## Description\n\n## Steps to Reproduce\n\n## Expected Behavior\n\n## Actual Behavior\n"
+    },
+    "task": {
+      "title_prefix": "Task:",
+      "labels": ["task"],
+      "body_template": "## Description\n\n## Checklist\n\n## Definition of Done\n"
+    }
+  }
+}

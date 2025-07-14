@@ -1,0 +1,29 @@
+{
+  "name": "Agile Team",
+  "description": "High-velocity agile development team",
+  "team_size": 7,
+  "sprint_duration_weeks": 1,
+  "velocity_points_per_sprint": 60,
+  "working_days_per_week": 5,
+  "hours_per_day": 8,
+  "roles": {
+    "developer": 4,
+    "senior_developer": 2,
+    "qa": 1
+  },
+  "capacity_distribution": {
+    "development": 0.75,
+    "testing": 0.15,
+    "planning": 0.1
+  },
+  "estimation_guidelines": {
+    "story_points": {
+      "1": "1 hour",
+      "2": "2-3 hours",
+      "3": "Half day",
+      "5": "1 day",
+      "8": "2-3 days",
+      "13": "Epic - break down"
+    }
+  }
+}

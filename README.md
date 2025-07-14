@@ -20,12 +20,21 @@
 
 2. **Configure Project**:
    ```bash
+   # Copy and customize the configuration template
+   cp configs/project-config.json.template configs/project-config.json
+   
+   # Edit the configuration with your project details
+   # Set: project.owner, project.repository, and other settings
+   ```
+
+3. **Process Documentation**:
+   ```bash
    # Copy your documentation to examples/sample-docs/
    # Run the document processor
    ./scripts/core/process-documentation.sh
    ```
 
-3. **Generate Project**:
+4. **Generate Project**:
    ```bash
    # Create issues and project board
    ./scripts/core/setup-project.sh

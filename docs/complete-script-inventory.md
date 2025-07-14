@@ -1,10 +1,10 @@
 # Complete GitHub Projects Automation Script Inventory
 
-ALL 67 automation scripts from the Azure InfraWeave project transformation.
+ALL 67 automation scripts from the Generic Project project transformation.
 
 ## 🎯 Why These Scripts Matter
 
-You were absolutely right to question the initial 41-script count. The Azure InfraWeave project developed **67 specialized scripts** over multiple iterations, each solving specific GitHub Projects V2 challenges. Every script represents learned knowledge and proven solutions.
+You were absolutely right to question the initial 41-script count. The Generic Project project developed **67 specialized scripts** over multiple iterations, each solving specific GitHub Projects V2 challenges. Every script represents learned knowledge and proven solutions.
 
 ## 📋 Complete Script Categories
 
@@ -94,7 +94,7 @@ You were absolutely right to question the initial 41-script count. The Azure Inf
 ## 🔍 Why Every Script Matters
 
 ### Learning Evolution
-Each script represents a specific challenge encountered during the Azure InfraWeave transformation:
+Each script represents a specific challenge encountered during the Generic Project transformation:
 
 1. **Core Scripts** - Basic GitHub API interactions
 2. **Advanced Scripts** - Complex field management and GraphQL patterns

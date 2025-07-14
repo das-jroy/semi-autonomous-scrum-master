@@ -1,0 +1,24 @@
+{
+  "name": "Infrastructure Project",
+  "description": "Cloud infrastructure and DevOps automation project",
+  "categories": ["infrastructure", "automation", "monitoring", "security", "compliance"],
+  "default_sprints": 8,
+  "complexity_factors": {
+    "simple": 2,
+    "medium": 5,
+    "complex": 8,
+    "epic": 13
+  },
+  "issue_templates": {
+    "module": {
+      "title_prefix": "Module:",
+      "labels": ["infrastructure", "module"],
+      "body_template": "## Module Description\n\n## Resources\n\n## Configuration\n\n## Testing\n"
+    },
+    "automation": {
+      "title_prefix": "Automation:",
+      "labels": ["automation", "task"],
+      "body_template": "## Automation Scope\n\n## Implementation\n\n## Validation\n"
+    }
+  }
+}

@@ -16,7 +16,21 @@
 
 ## Basic Setup
 
-### 1. Process Documentation
+### 1. Configure Your Project
+
+Copy and customize the configuration template:
+
+```bash
+cp configs/project-config.json.template configs/project-config.json
+```
+
+Edit `configs/project-config.json` with your project details:
+- `project.owner` - Your GitHub username or organization
+- `project.repository` - Your repository name  
+- `project.name` - Display name for your project
+- `project.description` - Project description
+
+### 2. Process Documentation
 
 Place your documentation in `examples/sample-docs/` and run:
 
@@ -26,13 +40,15 @@ Place your documentation in `examples/sample-docs/` and run:
 
 This will analyze your documentation and generate issue definitions.
 
-### 2. Create Project
+### 3. Create Project
 
 Generate the GitHub project and issues:
 
 ```bash
-./scripts/core/setup-project.sh examples/generated-issues/issues.json your-org your-repo
+./scripts/core/setup-project.sh
 ```
+
+The script will use your configuration file automatically.
 
 ## Advanced Configuration
 

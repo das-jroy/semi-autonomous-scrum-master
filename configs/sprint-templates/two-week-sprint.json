@@ -1,0 +1,42 @@
+{
+  "name": "2-Week Sprint Template",
+  "description": "Standard 2-week sprint configuration",
+  "duration_weeks": 2,
+  "phases": {
+    "planning": {
+      "duration_hours": 4,
+      "activities": ["story refinement", "sprint planning", "capacity planning"]
+    },
+    "development": {
+      "duration_days": 8,
+      "activities": ["development", "code review", "testing"]
+    },
+    "review": {
+      "duration_hours": 2,
+      "activities": ["demo", "stakeholder feedback"]
+    },
+    "retrospective": {
+      "duration_hours": 1,
+      "activities": ["team reflection", "process improvement"]
+    }
+  },
+  "ceremonies": {
+    "daily_standup": {
+      "frequency": "daily",
+      "duration_minutes": 15
+    },
+    "sprint_review": {
+      "frequency": "end_of_sprint",
+      "duration_hours": 2
+    },
+    "retrospective": {
+      "frequency": "end_of_sprint", 
+      "duration_hours": 1
+    }
+  },
+  "metrics": {
+    "velocity": "story_points_completed",
+    "burndown": "daily_remaining_work",
+    "quality": "defect_rate"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "project": {
+    "name": "Generic Project",
+    "description": "A generic project template for automated GitHub project management",
+    "owner": "",
+    "repository": "",
+    "project_id": ""
+  },
+  "defaults": {
+    "sprint_duration_weeks": 2,
+    "team_capacity_points": 40,
+    "default_assignee": "",
+    "default_labels": ["enhancement", "bug", "task"]
+  },
+  "issue_types": {
+    "feature": "Feature",
+    "bug": "Bug", 
+    "task": "Task",
+    "epic": "Epic",
+    "story": "Story"
+  },
+  "project_views": {
+    "board": "Kanban Board",
+    "table": "Issue Table",
+    "roadmap": "Project Roadmap",
+    "sprint": "Sprint Board",
+    "backlog": "Product Backlog"
+  }
+}

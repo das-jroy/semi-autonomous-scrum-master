@@ -1,6 +1,6 @@
 # Automation Script Inventory
 
-Complete inventory of GitHub Projects automation scripts ported from Azure InfraWeave project.
+Complete inventory of GitHub Projects automation scripts ported from Generic Project project.
 
 ## 📋 Core Issue Management (9 scripts)
 
@@ -90,7 +90,7 @@ Complete inventory of GitHub Projects automation scripts ported from Azure Infra
 - ✅ Rate limiting strategies
 - ✅ Error recovery patterns
 
-## 📈 Success Metrics from Azure InfraWeave
+## 📈 Success Metrics from Generic Project
 
 - **17/17 issues** - 100% success rate for issue type assignment
 - **17/17 issues** - 100% success rate for sprint field assignment
