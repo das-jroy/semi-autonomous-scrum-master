@@ -94,24 +94,51 @@ See: [Copilot Integration Flow](diagrams/copilot-integration-flow.mmd)
 
 ## Deployment Modes
 
-### Mode 1: Separate Repository (Recommended for MVP)
+**🔍 For comprehensive deployment strategy analysis, see: [Deployment Strategy Analysis](deployment-strategy-analysis.md)**
+
+### Mode 1: Central Orchestration Repository (Recommended for MVP)
 
 See: [Deployment Mode 1 Diagram](diagrams/deployment-mode-1.mmd)
 
+**Use Case**: One scrum master repository manages multiple external projects from a central location
+
 **Advantages**:
 - Clean separation of concerns
-- Can manage multiple target repositories
-- Easier to maintain and update
+- Can manage multiple target repositories simultaneously
+- Easier to maintain and update centrally
 - No pollution of target repository
+- Cross-project insights with Copilot
+- Enterprise scalability (10s or 100s of projects)
 
-### Mode 2: Embedded Integration
+**Best For**: Large organizations, dedicated DevOps teams, enterprise environments
+
+### Mode 2: Fork-Per-Project Integration
 
 See: [Deployment Mode 2 Diagram](diagrams/deployment-mode-2.mmd)
 
+**Use Case**: Each project forks/templates this repository and includes scrum master directly
+
 **Advantages**:
 - Everything in one place
-- Tighter integration
-- Immediate access to repo context
+- Tighter integration with codebase
+- Immediate access to full repo context for Copilot
+- Team ownership and control
+- Self-contained operation
+
+**Best For**: Individual teams, smaller organizations (< 10 projects), teams wanting full control
+
+### Mode 3: PR Integration (Package Distribution)
+
+**Use Case**: This repository generates PRs to add minimal scrum master capabilities to existing projects
+
+**Advantages**:
+- Minimal footprint in target repositories
+- Easy adoption (just merge a PR)
+- Package-based distribution
+- Gradual rollout capability
+- Optional integration
+
+**Best For**: Mixed adoption environments, gradual rollout, package-based distribution model
 
 ## Implementation Priority
 

@@ -98,29 +98,89 @@ Complete inventory of GitHub Projects automation scripts ported from Generic Pro
 - **25+ scripts** - Complete automation toolkit
 - **0 manual steps** - Fully automated project transformation
 
-## 🚀 Usage Patterns
+## 🚀 Usage Patterns by Deployment Strategy
 
-### Quick Start
+### Strategy 1: Central Orchestration
 ```bash
-# Process documentation and create project
-./scripts/core/process-documentation.sh examples/sample-docs/
-./scripts/core/setup-project.sh examples/generated-issues/issues.json
+# Manage multiple projects from this central repo
+./scripts/project-management/setup-project.sh --target-repo="org/project-alpha" 
+./scripts/automation/automated-kanban-setup.sh --project-id="PVT_123"
+./scripts/reporting/project-automation-summary.sh --all-managed-projects
 ```
 
-### Advanced Configuration
+### Strategy 2: Fork-Per-Project  
 ```bash
-# Custom project setup with specific templates
-./scripts/core/working-project-setup.sh MyProject infrastructure-template
-./scripts/core/setup-high-value-fields.sh
-./scripts/core/assign-sprint-field.sh
+# Use scripts within each forked project repo
+./scrum-master/scripts/setup/setup-project.sh examples/generated-issues/issues.json
+./scrum-master/scripts/automation/complete-kanban-automation.sh
+./scrum-master/scripts/validation/health-check.sh
 ```
 
-### Monitoring and Validation
+### Strategy 3: PR Integration
 ```bash
-# Health check and validation
-./scripts/core/health-check.sh
-./scripts/core/verify-native-issue-types.sh
-./scripts/core/project-automation-summary.sh
+# Package-based usage (after PR is merged)
+npx @copilot/scrum-master setup --config=.github/scrum-config.yml
+npx @copilot/scrum-master analyze --use-copilot
+npx @copilot/scrum-master plan-sprint --auto-update
+```
+
+## 🔄 Script Distribution by Strategy
+
+| Script Category | Central Orchestration | Fork-Per-Project | PR Integration |
+|-----------------|----------------------|------------------|----------------|
+| **Setup Scripts** | Stay in central repo | Copied to each fork | Packaged as CLI commands |
+| **Project Management** | Multi-project aware | Project-specific | Package functions |
+| **Automation** | Remote execution | Local execution | Package automation |
+| **Validation** | Cross-project checks | Local validation | Package health checks |
+| **Reporting** | Centralized dashboard | Local reports | Package reports |
+
+### Quick Start (All Strategies)
+```bash
+# Central Orchestration
+./scripts/setup/setup-wizard.sh --add-project="org/new-project"
+
+# Fork-Per-Project  
+git clone https://github.com/org/semi-autonomous-scrum-master-template new-project
+cd new-project && ./setup-scrum-master.sh
+
+# PR Integration
+gh workflow run generate-integration-pr.yml --repo=org/target-project
+```
+
+### Advanced Configuration (All Strategies)
+```bash
+# Central Orchestration - Multi-project setup
+./scripts/setup/working-project-setup.sh --config=configs/enterprise-config.yml
+./scripts/project-management/setup-high-value-fields.sh --all-projects
+./scripts/automation/assign-sprint-field.sh --project-batch
+
+# Fork-Per-Project - Deep integration
+./scrum-master/scripts/setup/working-project-setup.sh MyProject infrastructure-template
+./scrum-master/scripts/project-management/setup-high-value-fields.sh
+./scrum-master/scripts/automation/assign-sprint-field.sh
+
+# PR Integration - Package configuration
+npx @copilot/scrum-master configure --interactive
+npx @copilot/scrum-master setup-fields --project-type=web-app
+npx @copilot/scrum-master assign-sprint --current-issues
+```
+
+### Monitoring and Validation (All Strategies)
+```bash
+# Central Orchestration - Cross-project monitoring
+./scripts/validation/health-check.sh --all-managed-projects
+./scripts/validation/verify-native-issue-types.sh --project-batch
+./scripts/reporting/project-automation-summary.sh --enterprise-dashboard
+
+# Fork-Per-Project - Local monitoring
+./scrum-master/scripts/validation/health-check.sh
+./scrum-master/scripts/validation/verify-native-issue-types.sh
+./scrum-master/scripts/reporting/project-automation-summary.sh
+
+# PR Integration - Package monitoring  
+npx @copilot/scrum-master health-check
+npx @copilot/scrum-master verify-setup
+npx @copilot/scrum-master generate-report --format=markdown
 ```
 
 This inventory represents the complete GitHub Projects automation knowledge from a successful enterprise project transformation.

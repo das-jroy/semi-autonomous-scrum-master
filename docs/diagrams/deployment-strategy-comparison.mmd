@@ -1,0 +1,85 @@
+flowchart TD
+    %% Main Decision Point
+    Start([🤔 Choose Deployment Strategy]) --> Question1{How many projects?}
+    
+    %% Project Count Decision
+    Question1 -->|1-3 projects| ForkPath[Consider Fork-Per-Project]
+    Question1 -->|4-10 projects| MixedPath[Consider Central or PR]
+    Question1 -->|10+ projects| CentralPath[Strong → Central Orchestration]
+    
+    %% Fork-Per-Project Branch
+    ForkPath --> Question2{Need deep code integration?}
+    Question2 -->|Yes| ForkStrategy[🔄 Fork-Per-Project]
+    Question2 -->|No| MixedPath
+    
+    %% Mixed Path Decision
+    MixedPath --> Question3{Who maintains it?}
+    Question3 -->|Individual teams| ForkStrategy
+    Question3 -->|DevOps team| CentralStrategy[🎯 Central Orchestration]
+    Question3 -->|Mixed adoption| PRStrategy[🔀 PR Integration]
+    
+    %% Central Path
+    CentralPath --> CentralStrategy
+    
+    %% Strategy Details
+    subgraph Central [🎯 Central Orchestration]
+        direction TB
+        CentPro["✅ Multi-project management<br/>✅ Centralized configuration<br/>✅ No target repo pollution<br/>✅ Enterprise scalability<br/>✅ Cross-project insights"]
+        CentCon["❌ Complex permissions<br/>❌ Network dependency<br/>❌ Setup overhead"]
+        CentUse["🏢 Enterprise environments<br/>👥 Dedicated DevOps teams<br/>📊 Consistent practices"]
+    end
+    
+    subgraph Fork [🔄 Fork-Per-Project]
+        direction TB
+        ForkPro["✅ Deep integration<br/>✅ Self-contained<br/>✅ Simple permissions<br/>✅ Rich Copilot context<br/>✅ Team ownership"]
+        ForkCon["❌ Repository bloat<br/>❌ Update complexity<br/>❌ Version drift<br/>❌ Maintenance burden"]
+        ForkUse["👨‍💻 Individual teams<br/>🔗 Deep code integration<br/>🏠 Self-contained repos"]
+    end
+    
+    subgraph PR [🔀 PR Integration]
+        direction TB
+        PRPro["✅ Minimal footprint<br/>✅ Easy adoption<br/>✅ Gradual rollout<br/>✅ Package-based<br/>✅ Optional integration"]
+        PRCon["❌ Dependency management<br/>❌ Update friction<br/>❌ Version conflicts<br/>❌ Approval required"]
+        PRUse["📦 Package distribution<br/>🌊 Gradual adoption<br/>⚖️ Mixed environments"]
+    end
+    
+    %% Implementation Examples
+    CentralStrategy --> CentralImpl["`**Implementation:**
+    configs/project-alpha.yml
+    .github/workflows/orchestrate-*.yml
+    Multi-project dashboard`"]
+    
+    ForkStrategy --> ForkImpl["`**Implementation:**
+    project/scrum-master/
+    .scrum-config.yml
+    Deep codebase integration`"]
+    
+    PRStrategy --> PRImpl["`**Implementation:**
+    @copilot/scrum-master package
+    Minimal .github/workflows/
+    PR-based distribution`"]
+    
+    %% Current Script Usage
+    subgraph Scripts [📜 Our 41+ Scripts Usage]
+        direction LR
+        ScriptCentral["Central: Multi-project execution<br/>./scripts/setup/setup-project.sh --target-repo=org/project"]
+        ScriptFork["Fork: Local execution<br/>./scrum-master/scripts/setup/setup-project.sh"]
+        ScriptPR["PR: Package commands<br/>npx @copilot/scrum-master setup"]
+    end
+    
+    CentralImpl -.-> ScriptCentral
+    ForkImpl -.-> ScriptFork
+    PRImpl -.-> ScriptPR
+    
+    %% Styling
+    classDef strategyBox fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef proBox fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef conBox fill:#ffebee,stroke:#c62828,stroke-width:2px
+    classDef useBox fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+    classDef implBox fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    
+    class Central,Fork,PR strategyBox
+    class CentPro,ForkPro,PRPro proBox
+    class CentCon,ForkCon,PRCon conBox
+    class CentUse,ForkUse,PRUse useBox
+    class CentralImpl,ForkImpl,PRImpl,Scripts implBox
