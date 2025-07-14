@@ -1,6 +1,28 @@
 # Automation Script Inventory
 
-Complete inventory of GitHub Projects automation scripts ported from Generic Project project.
+Complete inventory of GitHub Projects automation scripts optimized for **Central Orchestration** deployment strategy.
+
+## 🎯 **Central Orchestration Strategy**
+
+This automation system is designed for **Central Orchestration** - managing multiple projects from a single repository with GitHub Copilot as the intelligent core. All 41+ scripts work across multiple target repositories with enterprise-scale automation.
+
+### **Multi-Project Execution Pattern**
+```bash
+# All scripts support multi-project orchestration
+./scripts/setup/setup-project.sh --target-repo="org/frontend-app" --project-type="web-app"
+./scripts/setup/setup-project.sh --target-repo="org/backend-api" --project-type="api-service"
+./scripts/setup/setup-project.sh --target-repo="org/mobile-app" --project-type="mobile-app"
+
+# Enterprise-wide health monitoring
+./scripts/validation/health-check.sh --all-managed-projects
+```
+
+### **GitHub Copilot Integration**
+Every script leverages GitHub Copilot for intelligent automation:
+- **Issue Creation**: Copilot writes user stories and acceptance criteria
+- **Sprint Planning**: AI-powered story point estimation and sprint planning
+- **Progress Analysis**: Intelligent insights and risk assessment
+- **Retrospectives**: Automated retrospective analysis and improvement recommendations
 
 ## 📋 Core Issue Management (9 scripts)
 
