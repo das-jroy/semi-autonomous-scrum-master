@@ -1,0 +1,130 @@
+sequenceDiagram
+    participant GHA as GitHub Actions
+    participant CLI as Scrum Master CLI
+    participant Facade as ScrumMasterFacade
+    participant Copilot as GitHub Copilot API
+    participant Strategy as CopilotStrategy
+    participant Template as CopilotScrumWorkflow
+    participant Observer as CopilotProgressMonitor
+    participant GitHub as GitHub API
+    
+    %% Project Analysis with Copilot Intelligence
+    rect rgb(230, 245, 255)
+    note over GHA, Copilot: Project Analysis - Copilot as Scrum Master Brain
+    GHA->>+CLI: scrum-master analyze --use-copilot
+    CLI->>+Facade: analyzeWithCopilot(projectContext)
+    
+    %% Strategy Pattern selects appropriate Copilot approach
+    Facade->>+Strategy: getCopilotStrategy(projectType)
+    Strategy->>+Copilot: "Analyze this web application project..."
+    note right of Copilot: Understands project structure,<br/>tech stack, team velocity,<br/>current state
+    Copilot-->>-Strategy: ProjectAnalysis with insights
+    Strategy-->>-Facade: Enhanced analysis
+    end
+    
+    %% Issue Generation with Definition of Ready
+    rect rgb(255, 245, 230)
+    note over Facade, Copilot: Issue Generation - Copilot writes User Stories
+    Facade->>+Copilot: generateIssuesWithDoR(requirements, context)
+    note right of Copilot: "As an experienced Scrum Master,<br/>create comprehensive user stories<br/>with Definition of Ready..."
+    
+    Copilot->>Copilot: Generate user stories
+    Copilot->>Copilot: Create acceptance criteria (Given/When/Then)
+    Copilot->>Copilot: Estimate story points (1,2,3,5,8,13)
+    Copilot->>Copilot: Add technical implementation notes
+    Copilot->>Copilot: Define testing requirements
+    
+    Copilot-->>-Facade: Issues with DoR compliance
+    end
+    
+    %% Sprint Planning with Copilot Intelligence
+    rect rgb(245, 255, 230)
+    note over Template, Copilot: Sprint Planning - Template Method + Copilot
+    Facade->>+Template: planSprintWithCopilot(backlog, teamMetrics)
+    
+    Template->>+Copilot: "Plan next sprint considering team capacity..."
+    note right of Copilot: Analyzes team velocity,<br/>dependencies, risks,<br/>sprint goal alignment
+    
+    Copilot->>Copilot: Select sprint items with rationale
+    Copilot->>Copilot: Assess risks and dependencies
+    Copilot->>Copilot: Create sprint goal
+    Copilot->>Copilot: Generate daily standup template
+    
+    Copilot-->>-Template: SprintPlan with intelligence
+    Template-->>Facade: Validated sprint plan
+    end
+    
+    %% Command Pattern with Copilot Validation
+    rect rgb(255, 230, 245)
+    note over Facade, GitHub: Command Execution - Copilot validates actions
+    Facade->>+Copilot: validateScrumAction(commandDescription)
+    note right of Copilot: "Review this planned action<br/>as a Scrum Master..."
+    
+    Copilot->>Copilot: Validate against scrum best practices
+    Copilot->>Copilot: Assess potential negative impacts
+    Copilot->>Copilot: Recommend modifications if needed
+    
+    Copilot-->>Facade: ValidationResult(approved: true)
+    
+    Facade->>+GitHub: Execute validated commands
+    GitHub-->>-Facade: CommandResults
+    
+    Facade->>+Copilot: analyzeExecutionResults(results)
+    Copilot-->>-Facade: Post-execution insights
+    end
+    
+    %% Observer Pattern with Copilot Monitoring
+    rect rgb(240, 255, 240)
+    note over Observer, Copilot: Progress Monitoring - Copilot provides insights
+    Observer->>+Copilot: analyzeSprintProgress(progressData)
+    
+    note right of Copilot: "Analyze sprint health,<br/>identify risks,<br/>suggest team actions..."
+    
+    Copilot->>Copilot: Assess sprint health (Green/Yellow/Red)
+    Copilot->>Copilot: Identify actionable recommendations
+    Copilot->>Copilot: Detect risks and mitigation strategies
+    Copilot->>Copilot: Generate team communication suggestions
+    
+    Copilot-->>-Observer: IntelligentInsights
+    
+    Observer->>Observer: Send smart notifications
+    Observer->>Observer: Schedule team check-ins if needed
+    Observer->>Observer: Update dashboard with insights
+    end
+    
+    %% Daily Standup Intelligence
+    rect rgb(255, 240, 255)
+    note over CLI, Copilot: Daily Standup - Copilot facilitates
+    CLI->>+Copilot: generateStandupInsights(teamUpdates)
+    
+    Copilot->>Copilot: Analyze team progress
+    Copilot->>Copilot: Identify blockers and dependencies
+    Copilot->>Copilot: Suggest focus areas
+    Copilot->>Copilot: Generate talking points
+    
+    Copilot-->>-CLI: StandupSummary with recommendations
+    end
+    
+    %% Retrospective Generation
+    rect rgb(240, 240, 255)
+    note over CLI, Copilot: Retrospectives - Copilot generates insights
+    CLI->>+Copilot: conductRetrospective(sprintData)
+    
+    Copilot->>Copilot: Analyze velocity trends
+    Copilot->>Copilot: Identify what went well
+    Copilot->>Copilot: Determine improvement areas
+    Copilot->>Copilot: Suggest actionable next steps
+    
+    Copilot-->>-CLI: RetrospectiveReport with insights
+    end
+    
+    %% Return enhanced results
+    Facade-->>-CLI: CopilotEnhancedResults
+    CLI-->>-GHA: Intelligent scrum artifacts
+    
+    %% Generate intelligent reports
+    GHA->>CLI: scrum-master report --copilot-insights
+    CLI->>+Copilot: generateScrumMasterReport(allData)
+    Copilot-->>-CLI: Comprehensive scrum report
+    CLI-->>GHA: Intelligent markdown report
+    GHA->>GitHub: Create PR comment with Copilot insights

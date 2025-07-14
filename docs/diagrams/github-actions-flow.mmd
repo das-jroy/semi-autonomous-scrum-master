@@ -1,0 +1,91 @@
+sequenceDiagram
+    participant GHA as GitHub Actions
+    participant CLI as Scrum Master CLI
+    participant Facade as ScrumMasterFacade
+    participant Factory as AnalyzerFactory
+    participant Strategy as AnalysisStrategy
+    participant Observer as ProgressObserver
+    participant Command as GitHubCommand
+    participant GitHub as GitHub API
+    
+    %% Initial Setup Phase
+    rect rgb(230, 245, 255)
+    note over GHA, CLI: Setup Phase - Factory & Strategy Patterns
+    GHA->>+CLI: scrum-master init --project-type=web-app
+    CLI->>+Facade: initializeProject(config)
+    
+    %% Factory Pattern in action
+    Facade->>+Factory: createAnalyzer('web-app')
+    Factory->>+Strategy: new WebAppAnalysisStrategy()
+    Factory-->>-Facade: analysisStrategy
+    
+    %% Template Method Pattern
+    Facade->>+Strategy: analyze(repository)
+    Strategy->>Strategy: discoverRepository()
+    Strategy->>Strategy: detectTechnology()
+    Strategy->>Strategy: parseDocumentation()
+    Strategy->>Strategy: assessCurrentState()
+    Strategy-->>-Facade: analysisResult
+    end
+    
+    %% Observer Pattern Setup
+    rect rgb(255, 245, 230)
+    note over GHA, Observer: Observer Pattern - Progress Monitoring
+    GHA->>CLI: scrum-master configure-observers --slack-webhook=...
+    CLI->>Facade: addSlackNotifier(webhook)
+    Facade->>+Observer: new SlackNotifier(webhook)
+    Facade->>Observer: addObserver(slackNotifier)
+    end
+    
+    %% Command Pattern for GitHub Operations
+    rect rgb(245, 255, 230)
+    note over GHA, GitHub: Command Pattern - GitHub API Operations
+    GHA->>CLI: scrum-master create-project --name="Sprint 1"
+    CLI->>Facade: createProjectBoard(projectData)
+    
+    loop For each operation
+        Facade->>+Command: new CreateProjectCommand(data)
+        Facade->>Command: executeCommand()
+        Command->>+GitHub: API call (create project)
+        GitHub-->>-Command: success/failure
+        
+        alt Success
+            Command-->>Facade: CommandResult(success)
+        else Failure
+            Command->>Command: undo()
+            Command-->>-Facade: CommandResult(error)
+        end
+    end
+    end
+    
+    %% Progress Monitoring with Observer Pattern
+    rect rgb(255, 230, 245)
+    note over Facade, Observer: Observer Pattern - Real-time Updates
+    Facade->>Observer: notifyObservers(ANALYSIS_STARTED)
+    Observer->>Observer: update(progressEvent)
+    Observer-->>External: Send Slack notification
+    
+    Facade->>Observer: notifyObservers(ISSUES_CREATED)
+    Observer->>Observer: update(progressEvent)
+    Observer-->>External: Update dashboard
+    end
+    
+    %% Scheduled Monitoring
+    rect rgb(240, 240, 255)
+    note over GHA, Observer: Scheduled Monitoring Workflow
+    GHA->>CLI: scrum-master monitor (cron: daily)
+    CLI->>Facade: monitorProgress()
+    Facade->>Observer: notifyObservers(DAILY_STANDUP)
+    Observer-->>External: Generate standup report
+    end
+    
+    %% Return results to GitHub Actions
+    Facade-->>-CLI: ProjectInitResult
+    CLI-->>-GHA: Exit code 0 + artifacts
+    
+    %% Final reporting
+    GHA->>CLI: scrum-master report --format=markdown
+    CLI->>Facade: generateReport()
+    Facade-->>CLI: markdown report
+    CLI-->>GHA: report file
+    GHA->>GitHub: Create commit comment with report
