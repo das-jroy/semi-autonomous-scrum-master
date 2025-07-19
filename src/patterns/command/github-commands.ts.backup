@@ -1,0 +1,591 @@
+import { Octokit } from  import { Octokit } from '@octokit/rest';
+import { GitHubCommand } from './github-command.interface';
+import { CommandResult } from './command-result.interface';
+
+/**
+ * Base GitHub Command Implementation
+ */
+export abstract class BaseGitHubCommand implements GitHubCommand {
+  protected octokit: Octokit;
+  protected startTime: Date;
+  
+  constructor(octokit: Octokit) {
+    this.octokit = octokit;
+    this.startTime = new Date();
+  }
+
+  abstract execute(): Promise<CommandResult>;
+  abstract undo(): Promise<CommandResult>;
+  abstract canUndo(): boolean;
+  abstract getDescription(): string;
+  abstract getType(): string;
+  abstract getMetadata(): Record<string, any>;
+
+  protected createResult(success: boolean, data?: any, error?: string): CommandResult {
+    return {
+      success,
+      data,
+      error,
+      executedAt: new Date(),
+      executionTime: new Date().getTime() - this.startTime.getTime()
+    };
+  }
+
+  protected createUndoResult(success: boolean, error?: string): CommandResult {
+    return {
+      success,
+      error,
+      executedAt: new Date()
+    };
+  }t/rest';
+import { GitHubCommand } from './github-command.interface';
+import { CommandResult } from './command-result.interface';
+
+/**
+ * Base GitHub Command Implementation
+ */
+export abstract class BaseGitHubCommand implements GitHubCommand {
+  protected octokit: Octokit;
+  protected startTime: Date;
+  
+  constructor(octokit: Octokit) {
+    this.octokit = octokit;
+    this.startTime = new Date();
+  }
+
+  abstract execute(): Promise<CommandResult>;
+  abstract undo(): Promise<CommandResult>;
+  abstract canUndo(): boolean;
+  abstract getDescription(): string;
+  abstract getType(): string;
+  abstract getMetadata(): Record<string, any>;
+
+  protected createResult(success: boolean, data?: any, error?: string): CommandResult {
+    return {
+      success,
+      data,
+      error,
+      executedAt: new Date(),
+      executionTime: Date.now() - this.startTime.getTime()
+    };
+  }
+}
+
+/**
+ * Create GitHub Project Command
+ * Replaces: working-project-setup.sh, setup-project-board.sh
+ */
+export class CreateProjectCommand extends BaseGitHubCommand {
+  private projectData: ProjectData;
+  private createdProjectId?: string;
+
+  constructor(octokit: Octokit, projectData: ProjectData) {
+    super(octokit);
+    this.projectData = projectData;
+  }
+
+  async execute(): Promise<CommandResult> {
+    try {
+      // Create GitHub Project V2
+      const projectResponse = await this.octokit.graphql(`
+        mutation CreateProject($ownerId: ID!, $title: String!, $body: String!) {
+          createProjectV2(input: {
+            ownerId: $ownerId
+            title: $title
+            body: $body
+          }) {
+            projectV2 {
+              id
+              title
+              url
+              number
+            }
+          }
+        }
+      `, {
+        ownerId: this.projectData.ownerId,
+        title: this.projectData.title,
+        body: this.projectData.description
+      });
+
+      const project = projectResponse.createProjectV2.projectV2;
+      this.createdProjectId = project.id;
+
+      // Create custom fields
+      await this.createCustomFields(project.id);
+
+      // Create default views
+      await this.createDefaultViews(project.id);
+
+      return this.createResult(true, {
+        projectId: project.id,
+        projectUrl: project.url,
+        projectNumber: project.number
+      });
+    } catch (error) {
+      return this.createResult(false, null, error.message);
+    }
+  }
+
+  private async createCustomFields(projectId: string): Promise<void> {
+    const fields = [
+      {
+        name: 'Priority Level',
+        dataType: 'SINGLE_SELECT',
+        options: ['P1 - Critical', 'P2 - High', 'P3 - Medium', 'P4 - Low']
+      },
+      {
+        name: 'Module Category',
+        dataType: 'SINGLE_SELECT',
+        options: ['Foundation', 'Core Services', 'Integration', 'Documentation']
+      },
+      {
+        name: 'Complexity',
+        dataType: 'SINGLE_SELECT',
+        options: ['Simple', 'Moderate', 'Complex', 'Very Complex']
+      },
+      {
+        name: 'Security Review',
+        dataType: 'SINGLE_SELECT',
+        options: ['Not Required', 'Required', 'In Progress', 'Complete']
+      }
+    ];
+
+    for (const field of fields) {
+      await this.octokit.graphql(`
+        mutation CreateField($projectId: ID!, $name: String!, $dataType: ProjectV2CustomFieldType!, $options: [ProjectV2SingleSelectFieldOptionInput!]) {
+          createProjectV2Field(input: {
+            projectId: $projectId
+            name: $name
+            dataType: $dataType
+            singleSelectOptions: $options
+          }) {
+            projectV2Field {
+              id
+              name
+            }
+          }
+        }
+      `, {
+        projectId,
+        name: field.name,
+        dataType: field.dataType,
+        options: field.options.map(name => ({ name }))
+      });
+    }
+  }
+
+  private async createDefaultViews(projectId: string): Promise<void> {
+    const views = [
+      { name: 'By Priority', layout: 'TABLE_LAYOUT' },
+      { name: 'By Category', layout: 'TABLE_LAYOUT' },
+      { name: 'Security Dashboard', layout: 'TABLE_LAYOUT' },
+      { name: 'Sprint Board', layout: 'BOARD_LAYOUT' },
+      { name: 'Roadmap', layout: 'ROADMAP_LAYOUT' }
+    ];
+
+    for (const view of views) {
+      await this.octokit.graphql(`
+        mutation CreateView($projectId: ID!, $name: String!, $layout: ProjectV2ViewLayout!) {
+          createProjectV2View(input: {
+            projectId: $projectId
+            name: $name
+            layout: $layout
+          }) {
+            projectV2View {
+              id
+              name
+            }
+          }
+        }
+      `, {
+        projectId,
+        name: view.name,
+        layout: view.layout
+      });
+    }
+  }
+
+  async undo(): Promise<void> {
+    if (this.createdProjectId) {
+      await this.octokit.graphql(`
+        mutation DeleteProject($projectId: ID!) {
+          deleteProjectV2(input: {
+            projectId: $projectId
+          }) {
+            projectV2 {
+              id
+            }
+          }
+        }
+      `, {
+        projectId: this.createdProjectId
+      });
+    }
+  }
+
+  canUndo(): boolean {
+    return !!this.createdProjectId;
+  }
+
+  getDescription(): string {
+    return `Create GitHub Project: ${this.projectData.title}`;
+  }
+}
+
+/**
+ * Create Issues Command
+ * Replaces: create-github-issues.sh, secure-github-issues.sh
+ */
+export class CreateIssuesCommand extends BaseGitHubCommand {
+  private issueData: IssueData[];
+  private createdIssues: number[] = [];
+
+  constructor(octokit: Octokit, issueData: IssueData[]) {
+    super(octokit);
+    this.issueData = issueData;
+  }
+
+  async execute(): Promise<CommandResult> {
+    try {
+      const createdIssues = [];
+
+      for (const issue of this.issueData) {
+        // Create the issue
+        const issueResponse = await this.octokit.rest.issues.create({
+          owner: issue.owner,
+          repo: issue.repo,
+          title: issue.title,
+          body: issue.body,
+          labels: issue.labels || [],
+          assignees: issue.assignees || []
+        });
+
+        this.createdIssues.push(issueResponse.data.number);
+
+        // Set native GitHub issue type
+        if (issue.issueType) {
+          await this.setNativeIssueType(
+            issue.owner,
+            issue.repo,
+            issueResponse.data.number,
+            issue.issueType
+          );
+        }
+
+        createdIssues.push({
+          number: issueResponse.data.number,
+          title: issue.title,
+          url: issueResponse.data.html_url
+        });
+      }
+
+      return this.createResult(true, { issues: createdIssues });
+    } catch (error) {
+      return this.createResult(false, null, error.message);
+    }
+  }
+
+  private async setNativeIssueType(owner: string, repo: string, issueNumber: number, issueType: string): Promise<void> {
+    await this.octokit.graphql(`
+      mutation SetIssueType($issueId: ID!, $issueType: IssueType!) {
+        updateIssue(input: {
+          id: $issueId
+          issueType: $issueType
+        }) {
+          issue {
+            id
+            issueType
+          }
+        }
+      }
+    `, {
+      issueId: `I_${issueNumber}`, // GitHub's internal ID format
+      issueType: issueType.toUpperCase()
+    });
+  }
+
+  async undo(): Promise<void> {
+    for (const issueNumber of this.createdIssues) {
+      const issue = this.issueData.find(i => i.title === `Issue ${issueNumber}`);
+      if (issue) {
+        await this.octokit.rest.issues.update({
+          owner: issue.owner,
+          repo: issue.repo,
+          issue_number: issueNumber,
+          state: 'closed'
+        });
+      }
+    }
+  }
+
+  canUndo(): boolean {
+    return this.createdIssues.length > 0;
+  }
+
+  getDescription(): string {
+    return `Create ${this.issueData.length} GitHub Issues`;
+  }
+}
+
+/**
+ * Setup Sprint Command
+ * Replaces: setup-sprint-assignment.sh, assign-sprint-field.sh, set-sprint-field.sh
+ */
+export class SetupSprintCommand extends BaseGitHubCommand {
+  private sprintData: SprintData;
+  private projectId: string;
+
+  constructor(octokit: Octokit, sprintData: SprintData, projectId: string) {
+    super(octokit);
+    this.sprintData = sprintData;
+    this.projectId = projectId;
+  }
+
+  async execute(): Promise<CommandResult> {
+    try {
+      // Create sprint label
+      await this.octokit.rest.issues.createLabel({
+        owner: this.sprintData.owner,
+        repo: this.sprintData.repo,
+        name: `sprint-${this.sprintData.number}`,
+        description: `Sprint ${this.sprintData.number}: ${this.sprintData.name}`,
+        color: '1f77b4'
+      });
+
+      // Get all open issues
+      const issues = await this.octokit.rest.issues.listForRepo({
+        owner: this.sprintData.owner,
+        repo: this.sprintData.repo,
+        state: 'open',
+        per_page: 100
+      });
+
+      // Add sprint label to all issues
+      for (const issue of issues.data) {
+        await this.octokit.rest.issues.addLabels({
+          owner: this.sprintData.owner,
+          repo: this.sprintData.repo,
+          issue_number: issue.number,
+          labels: [`sprint-${this.sprintData.number}`]
+        });
+      }
+
+      // Create iteration field in project (requires GraphQL)
+      await this.createIterationField();
+
+      return this.createResult(true, {
+        sprintLabel: `sprint-${this.sprintData.number}`,
+        issuesAssigned: issues.data.length
+      });
+    } catch (error) {
+      return this.createResult(false, null, error.message);
+    }
+  }
+
+  private async createIterationField(): Promise<void> {
+    await this.octokit.graphql(`
+      mutation CreateIterationField($projectId: ID!, $name: String!, $startDate: Date!, $duration: Int!) {
+        createProjectV2Field(input: {
+          projectId: $projectId
+          name: $name
+          dataType: ITERATION
+          iterationOptions: {
+            startDate: $startDate
+            duration: $duration
+            iterationCadence: WEEKS
+          }
+        }) {
+          projectV2Field {
+            id
+            name
+          }
+        }
+      }
+    `, {
+      projectId: this.projectId,
+      name: 'Sprint',
+      startDate: this.sprintData.startDate,
+      duration: this.sprintData.duration
+    });
+  }
+
+  async undo(): Promise<void> {
+    // Remove sprint label from all issues
+    const issues = await this.octokit.rest.issues.listForRepo({
+      owner: this.sprintData.owner,
+      repo: this.sprintData.repo,
+      labels: [`sprint-${this.sprintData.number}`]
+    });
+
+    for (const issue of issues.data) {
+      await this.octokit.rest.issues.removeLabel({
+        owner: this.sprintData.owner,
+        repo: this.sprintData.repo,
+        issue_number: issue.number,
+        name: `sprint-${this.sprintData.number}`
+      });
+    }
+
+    // Delete sprint label
+    await this.octokit.rest.issues.deleteLabel({
+      owner: this.sprintData.owner,
+      repo: this.sprintData.repo,
+      name: `sprint-${this.sprintData.number}`
+    });
+  }
+
+  canUndo(): boolean {
+    return true;
+  }
+
+  getDescription(): string {
+    return `Setup Sprint ${this.sprintData.number}: ${this.sprintData.name}`;
+  }
+}
+
+/**
+ * Update Board Command
+ * Replaces: update-board.sh, status-lane-optimization.sh
+ */
+export class UpdateBoardCommand extends BaseGitHubCommand {
+  private boardData: BoardData;
+  private projectId: string;
+
+  constructor(octokit: Octokit, boardData: BoardData, projectId: string) {
+    super(octokit);
+    this.boardData = boardData;
+    this.projectId = projectId;
+  }
+
+  async execute(): Promise<CommandResult> {
+    try {
+      // Update project items with new status
+      for (const item of this.boardData.items) {
+        await this.updateProjectItem(item);
+      }
+
+      // Optimize status lanes
+      await this.optimizeStatusLanes();
+
+      return this.createResult(true, {
+        itemsUpdated: this.boardData.items.length
+      });
+    } catch (error) {
+      return this.createResult(false, null, error.message);
+    }
+  }
+
+  private async updateProjectItem(item: ProjectItem): Promise<void> {
+    await this.octokit.graphql(`
+      mutation UpdateProjectItem($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: String!) {
+        updateProjectV2ItemFieldValue(input: {
+          projectId: $projectId
+          itemId: $itemId
+          fieldId: $fieldId
+          value: {
+            singleSelectOptionId: $value
+          }
+        }) {
+          projectV2Item {
+            id
+          }
+        }
+      }
+    `, {
+      projectId: this.projectId,
+      itemId: item.id,
+      fieldId: item.fieldId,
+      value: item.value
+    });
+  }
+
+  private async optimizeStatusLanes(): Promise<void> {
+    // Get current status distribution
+    const statusDistribution = await this.getStatusDistribution();
+    
+    // Implement lane optimization logic
+    // This could include rebalancing, creating new lanes, etc.
+    console.log('Status distribution:', statusDistribution);
+  }
+
+  private async getStatusDistribution(): Promise<Record<string, number>> {
+    const result = await this.octokit.graphql(`
+      query GetProjectItems($projectId: ID!) {
+        node(id: $projectId) {
+          ... on ProjectV2 {
+            items(first: 100) {
+              nodes {
+                fieldValues(first: 10) {
+                  nodes {
+                    ... on ProjectV2ItemFieldSingleSelectValue {
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `, {
+      projectId: this.projectId
+    });
+
+    // Process and return status distribution
+    const distribution: Record<string, number> = {};
+    // ... processing logic
+    return distribution;
+  }
+
+  async undo(): Promise<void> {
+    // Revert project items to previous status
+    // This would require storing previous state
+  }
+
+  canUndo(): boolean {
+    return false; // Complex operation, difficult to undo
+  }
+
+  getDescription(): string {
+    return `Update Board with ${this.boardData.items.length} items`;
+  }
+}
+
+/**
+ * Data interfaces for commands
+ */
+export interface ProjectData {
+  ownerId: string;
+  title: string;
+  description: string;
+}
+
+export interface IssueData {
+  owner: string;
+  repo: string;
+  title: string;
+  body: string;
+  labels?: string[];
+  assignees?: string[];
+  issueType?: 'bug' | 'feature' | 'task' | 'enhancement';
+}
+
+export interface SprintData {
+  owner: string;
+  repo: string;
+  number: number;
+  name: string;
+  startDate: string;
+  duration: number; // weeks
+}
+
+export interface BoardData {
+  items: ProjectItem[];
+}
+
+export interface ProjectItem {
+  id: string;
+  fieldId: string;
+  value: string;
+}
