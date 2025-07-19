@@ -1,0 +1,24 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "strictPropertyInitialization": false,
+    "noImplicitReturns": false,
+    "exactOptionalPropertyTypes": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
+    "isolatedModules": true,
+    "types": ["jest", "node"]
+  },
+  "include": [
+    "src/**/*",
+    "tests/**/*",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

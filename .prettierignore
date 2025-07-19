@@ -1,0 +1,17 @@
+# Prettier ignore patterns
+node_modules/
+dist/
+build/
+coverage/
+
+# Generated files
+*.d.ts
+
+# Log files
+*.log
+
+# Configuration files that should maintain specific formatting
+.env*
+
+# Files with special formatting requirements
+CHANGELOG.md

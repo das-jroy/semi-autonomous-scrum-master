@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Generated files
+*.d.ts
+
+# Test files that don't need linting
+**/jest.config.js
+**/.eslintrc.js
+
+# Configuration files
+.eslintrc.js
+jest.config.js
+.prettierrc.js
+
+# Logs
+*.log
+
+# Environment files
+.env*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
